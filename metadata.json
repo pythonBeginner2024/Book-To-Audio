@@ -1,0 +1,6 @@
+{
+  "name": "BookToAudio",
+  "description": "Application web de transformation de livres PDF en résumés audio pédagogiques par chapitre via Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

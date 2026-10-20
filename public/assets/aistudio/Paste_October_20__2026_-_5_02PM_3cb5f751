@@ -1,0 +1,625 @@
+# PROMPT MAÎTRE — BOOKTOAUDIO
+## Application web gratuite de transformation de livres PDF en résumés audio pédagogiques
+
+### 1. TON RÔLE
+
+Agis comme un ingénieur logiciel senior spécialisé en applications web, React, TypeScript, intégration des API Google Gemini, génération audio, sécurité côté client, traitement documentaire et déploiement de sites statiques.
+
+Tu dois **concevoir, développer, tester et préparer le déploiement d'une application web fonctionnelle**, appelée provisoirement BookToAudio.
+
+Ne te contente pas de proposer une architecture, de générer une maquette ou de fournir quelques extraits de code. Construis progressivement une application utilisable, cohérente, testable et publiable gratuitement sur GitHub Pages.
+
+Travaille par étapes, mais conserve un objectif global : livrer une application complète.
+
+Si une fonctionnalité est techniquement impossible dans les contraintes retenues, explique précisément pourquoi, propose la meilleure alternative compatible et ne simule jamais son fonctionnement.
+
+Toutes les explications, l'interface, les messages d'erreur et la documentation destinés à l'utilisateur doivent être en français.
+
+---
+
+### 2. VISION DU PRODUIT
+
+Je veux une application web personnelle qui me permette d'importer des livres au format PDF et de les transformer en résumés audio pédagogiques, section par section.
+
+L'objectif n'est pas de produire un résumé superficiel du livre. Je veux une explication orale naturelle, structurée et fidèle au contenu, qui restitue les idées importantes, les raisonnements, les exemples utiles et les nuances de l'auteur.
+
+Je veux pouvoir :
+
+- Importer un livre PDF depuis mon ordinateur.
+- Extraire son texte sans recourir à un service OCR distant.
+- Identifier automatiquement les chapitres et sous-sections.
+- Préparer un résumé explicatif pour chaque section.
+- Vérifier que les idées importantes n'ont pas été oubliées.
+- Corriger et valider les textes avant de générer l'audio.
+- Générer un fichier audio distinct pour chaque section.
+- Écouter les fichiers directement dans l'application.
+- Télécharger chaque fichier audio séparément.
+- Télécharger tous les audios d'un livre dans une archive ZIP.
+- Reprendre un traitement interrompu sans tout recommencer.
+- Choisir les clés API Google AI Studio que j'utilise pour les différentes tâches.
+
+L'application doit être optimisée pour un usage personnel, des livres volumineux et un budget nul pour l'hébergement obligatoire.
+
+### 3. CONTRAINTES TECHNIQUES NON NÉGOCIABLES
+
+Architecture cible :
+
+- React.
+- TypeScript.
+- Vite ou un système de build compatible avec GitHub Pages.
+- Interface responsive, utilisable sur ordinateur et mobile.
+- PDF.js pour extraire le texte des PDF textuels dans le navigateur.
+- IndexedDB pour sauvegarder localement les projets et les résultats volumineux.
+- localStorage uniquement pour les petits paramètres non sensibles.
+- API REST Gemini, ou SDK officiellement compatible avec les appels côté navigateur, pour les fonctions d'IA.
+- Une solution fiable de génération et de téléchargement de fichiers ZIP.
+- Une bibliothèque audio ou une solution compatible avec les formats réellement retournés par le modèle choisi.
+
+L'application finale doit être un site statique publiable sur GitHub Pages.
+
+**Aucun serveur personnel, backend obligatoire, abonnement d'hébergement, base de données distante, Firebase obligatoire ou service de stockage payant ne doit être nécessaire au fonctionnement de la version initiale.**
+
+Ne crée pas de dépendance à un serveur Node.js en production. Node.js peut être utilisé pendant le développement et la compilation.
+
+Ne suppose pas que Google AI Studio héberge automatiquement l'application finale. Prépare un projet exportable et publiable indépendamment.
+
+Avant de choisir les modèles, bibliothèques et méthodes d'appel, vérifie leur compatibilité actuelle avec les API officielles Google Gemini, les modèles effectivement disponibles, les formats audio supportés, les quotas et les restrictions du navigateur.
+
+N'invente aucun nom de modèle ni aucune capacité d'API. Si une fonctionnalité dépend d'un modèle particulier, prévois une configuration explicite et un message indiquant les modèles compatibles.
+
+### 4. ARCHITECTURE DE SÉCURITÉ ET GESTION DES CLÉS API
+
+La gestion des clés est une fonctionnalité centrale.
+
+Je dispose de plusieurs clés Google AI Studio. Je veux les ajouter, les nommer, choisir leur usage et décider manuellement de celle qui sera utilisée pour une opération.
+
+Crée une page « Paramètres API » contenant :
+
+- Un formulaire d'ajout d'une clé.
+- Un nom personnalisé, par exemple « Gemini — Analyse ».
+- Une catégorie d'usage : analyse et rédaction, génération audio, ou polyvalente.
+- Un identifiant de projet facultatif pour m'aider à m'y retrouver.
+- Le modèle associé, si nécessaire.
+- Un indicateur de clé configurée, sans afficher la clé en clair par défaut.
+- Des actions pour tester, modifier, supprimer et sélectionner une clé.
+- Une confirmation avant toute suppression.
+- Un indicateur signalant qu'une clé n'est pas configurée ou qu'un test a échoué.
+
+L'application doit distinguer les clés par usage. Je dois pouvoir choisir une clé pour analyser et résumer les textes, puis une autre pour générer les audios.
+
+Ne suppose jamais que tous les modèles acceptent les mêmes fonctions, les mêmes paramètres ou les mêmes limites.
+
+#### Conservation facultative
+
+Par défaut, les clés doivent rester en mémoire pendant la session et disparaître de l'état actif lorsqu'on ferme ou actualise la page, sauf si l'utilisateur choisit explicitement une autre option.
+
+Propose une option facultative « Enregistrer cette clé sur cet appareil ».
+
+Si elle est activée, la clé peut être conservée dans le stockage local du navigateur. Affiche avant activation un avertissement expliquant qu'une personne ayant accès au profil du navigateur ou à un environnement compromis pourrait récupérer la clé.
+
+Permets de désactiver cette conservation et de supprimer les clés locales.
+
+Ne prétends jamais qu'une clé stockée dans le navigateur est chiffrée ou protégée si ce n'est pas réellement le cas. Ne crée pas de mécanisme cryptographique artificiel qui donnerait une fausse impression de sécurité.
+
+#### Sécurité obligatoire
+
+- Ne jamais coder en dur une clé API dans le code source.
+- Ne jamais placer une clé dans un fichier de configuration public.
+- Ne jamais commiter une clé dans Git.
+- Ne jamais inclure une clé dans les journaux, les messages d'erreur, les exports ou les sauvegardes de projet.
+- Ne jamais afficher une clé complète après sa saisie, sauf nécessité explicitement justifiée.
+- Ne jamais transmettre une clé à un service tiers autre que le fournisseur prévu pour son utilisation.
+- Ne jamais envoyer automatiquement les clés vers GitHub.
+- Ne jamais exporter les clés dans les archives ZIP.
+- Ajouter un fichier `.gitignore` approprié et un fichier `.env.example` sans aucune valeur secrète réelle.
+- Prévoir une confirmation avant d'envoyer un contenu à une API externe.
+- Afficher un avertissement de confidentialité indiquant que le texte envoyé à Gemini quitte l'appareil et est soumis aux conditions applicables du service.
+- Éviter de transmettre le PDF complet lorsqu'un extrait ou une section suffit.
+
+**Limite de sécurité incontournable :** avec GitHub Pages et des appels Gemini exécutés directement dans le navigateur, une clé utilisée pour une requête peut être visible dans les outils de développement ou par du code malveillant exécuté sur la page. Aucun masquage visuel ne peut rendre cette clé secrète.
+
+Explique clairement ce compromis dans les paramètres. Cette version est destinée à un usage personnel et à des clés dont l'utilisation et les risques sont maîtrisés. Ne présente pas cette architecture comme adaptée à un service public accueillant les clés de nombreux utilisateurs.
+
+Ne construis pas de système de rotation automatique de clés destiné à contourner les quotas, les limites de débit ou les restrictions du fournisseur.
+
+Permets seulement une sélection manuelle et explicite d'une clé par tâche. Si une limite est atteinte, arrête l'opération, explique la situation et propose de réessayer ultérieurement ou de sélectionner manuellement une autre clé autorisée.
+
+### 5. IMPORTATION ET EXTRACTION DES LIVRES
+
+Crée une page d'accueil avec une zone d'importation PDF.
+
+Fonctionnalités :
+
+- Sélection de fichier.
+- Glisser-déposer.
+- Affichage du nom, de la taille et du nombre de pages.
+- Vérification du type de fichier.
+- Indication claire des erreurs.
+- Possibilité de supprimer un livre du projet.
+- Barre de progression de l'extraction.
+
+Le PDF doit être traité localement dans le navigateur grâce à PDF.js.
+
+Extrais le texte page par page, en conservant autant que possible les paragraphes, titres, listes et références de page.
+
+N'effectue pas d'OCR distant. Si le PDF est composé uniquement de pages scannées ou contient trop peu de texte extractible, indique qu'il n'est pas compatible avec cette version et explique que l'OCR n'est pas inclus.
+
+Ne déclare pas automatiquement qu'un PDF est vide avant d'avoir vérifié le résultat de l'extraction.
+
+Permets de consulter le texte extrait et de repérer les pages pour lesquelles l'extraction semble insuffisante.
+
+Pour les livres volumineux, traite les pages par lots et évite de charger inutilement plusieurs copies du document en mémoire.
+
+Le PDF original doit rester local, sauf action explicite de l'utilisateur demandant un envoi externe. Les appels à Gemini doivent transmettre uniquement les passages nécessaires à la tâche.
+
+### 6. DÉCOUPAGE DU LIVRE
+
+Après extraction, propose une étape de structuration.
+
+L'application doit :
+
+1. Détecter les titres, chapitres, sections et sous-sections.
+2. Exploiter les titres, la numérotation et les changements de structure.
+3. Conserver l'ordre original du livre.
+4. Afficher une table des matières générée.
+5. Permettre de modifier les titres.
+6. Permettre de fusionner ou de séparer des sections.
+7. Permettre de sélectionner les sections à traiter.
+8. Associer chaque section aux pages sources lorsque cela est possible.
+
+Si la structure n'est pas claire, propose un découpage assisté par Gemini.
+
+Ne découpe pas arbitrairement les textes en perdant le contexte ou en coupant systématiquement au milieu d'un raisonnement.
+
+Pour chaque section, définis une taille compatible avec les limites actuelles du modèle sélectionné. En cas de dépassement, fractionne le contenu en sous-parties, puis rassemble les résultats de façon cohérente.
+
+### 7. MÉTHODE DE RÉSUMÉ EXPLICATIF
+
+La qualité pédagogique constitue le principal objectif du projet.
+
+Ne demande pas à Gemini de résumer directement une section sans préparation.
+
+Pour chaque section, exécute une procédure en plusieurs étapes.
+
+#### Étape A — Inventaire des idées importantes
+
+Analyse le texte source et produis une liste structurée des éléments qui doivent être préservés :
+
+- Thèse ou idée centrale.
+- Concepts et définitions.
+- Arguments et raisonnements.
+- Étapes d'une méthode.
+- Exemples significatifs.
+- Chiffres, faits et références utiles.
+- Relations de cause à effet.
+- Distinctions importantes.
+- Exceptions et limites.
+- Nuances, réserves et objections.
+- Conclusions et implications.
+
+Adapte cet inventaire au genre du livre. Un manuel technique, un ouvrage de psychologie et un livre de stratégie ne nécessitent pas exactement la même grille.
+
+Chaque élément doit avoir un identifiant permettant de vérifier ultérieurement sa couverture.
+
+#### Étape B — Rédaction du script oral
+
+Produis un texte en français naturel, conçu pour être écouté et non simplement lu.
+
+Le script doit :
+
+- Expliquer les idées avec des formulations accessibles.
+- Conserver la logique et les nuances de l'auteur.
+- Développer les concepts difficiles.
+- Préserver les exemples réellement utiles.
+- Ajouter des transitions naturelles entre les idées.
+- Expliquer les relations entre les concepts.
+- Éviter les répétitions et les introductions artificiellement longues.
+- Éviter les formulations robotiques ou les listes interminables.
+- Ne pas inventer de citations, d'exemples attribués à l'auteur ou de faits absents du texte.
+- Distinguer explicitement les explications ajoutées des affirmations du livre lorsque cette distinction est importante.
+
+Le texte doit être suffisamment détaillé pour apprendre réellement quelque chose. Il n'est pas nécessaire de viser une longueur fixe si cela oblige à supprimer des informations importantes.
+
+La durée audio estimée doit être calculée à partir du texte produit et d'une vitesse de parole configurable ou raisonnablement estimée.
+
+Structure orale recommandée :
+
+1. Présentation du sujet et de la question centrale.
+2. Explication progressive des idées.
+3. Développement des exemples et des raisonnements.
+4. Liens avec les autres concepts de la section.
+5. Conclusion.
+6. « À retenir » : synthèse finale des éléments essentiels.
+
+N'utilise pas systématiquement des formules comme « dans cette section, l'auteur nous explique » si elles rendent le discours répétitif.
+
+#### Étape C — Vérification de la couverture
+
+Compare le script final à l'inventaire initial.
+
+Pour chaque élément, indique :
+
+- Couvert correctement.
+- Couvert partiellement.
+- Oublié.
+- À vérifier manuellement.
+
+Quand un élément important est oublié, demande à Gemini de corriger le script en conservant les passages déjà satisfaisants.
+
+N'invente pas un score de fidélité scientifiquement validé. Affiche plutôt un indicateur de couverture fondé sur les éléments de l'inventaire et explique son mode de calcul.
+
+Ne marque pas une section comme validée tant que les éléments critiques ne sont pas couverts ou explicitement signalés pour révision.
+
+#### Étape D — Validation humaine
+
+Avant la génération audio, affiche :
+
+- Le texte source ou un extrait consultable.
+- Le script explicatif.
+- L'inventaire des idées importantes.
+- Les éléments manquants ou incertains.
+- Un bouton pour corriger le script.
+- Un bouton pour relancer la vérification.
+- Un bouton « Valider ce script ».
+
+L'utilisateur doit pouvoir modifier le script manuellement. Une modification doit invalider, si nécessaire, la précédente vérification de couverture.
+
+### 8. GÉNÉRATION AUDIO
+
+L'application doit générer un fichier audio par section validée.
+
+Avant de lancer la génération :
+
+- Vérifie que la clé audio est configurée.
+- Vérifie que le modèle sélectionné est réellement compatible avec la génération audio.
+- Présente les paramètres de génération disponibles.
+- Affiche une estimation de la longueur du script et, si possible, du coût ou de l'utilisation des quotas.
+- Précise que les estimations peuvent être incomplètes ou varier selon le modèle.
+
+L'audio doit être en français.
+
+Si le modèle offre des options de voix, présente uniquement les options réellement supportées. Ne simule pas un choix de voix si l'API ne le permet pas.
+
+Prévois :
+
+- Un bouton pour générer un audio.
+- Un bouton pour générer les audios des sections sélectionnées.
+- Une file d'attente visible.
+- Une progression par section.
+- Une gestion des erreurs.
+- Une possibilité de réessayer uniquement les sections échouées.
+- Une lecture audio dans le navigateur.
+- Une possibilité de réécouter un fichier.
+- Un téléchargement individuel.
+- Une indication de durée lorsque les métadonnées permettent de l'obtenir.
+
+Les réponses audio peuvent contenir des données binaires, des encodages ou des formats particuliers. Inspecte le format réel renvoyé par l'API et construis correctement le fichier téléchargeable.
+
+Ne suppose jamais que tous les segments audio peuvent être concaténés directement. Le téléchargement global doit être une archive ZIP comprenant un fichier audio indépendant pour chaque section, sans concaténation hasardeuse.
+
+Les fichiers doivent avoir des noms ordonnés, par exemple :
+
+01-introduction.mp3
+02-chapitre-1.mp3
+03-chapitre-2.mp3
+
+N'utilise l'extension `.mp3` que si le fichier est réellement encodé en MP3. Sinon, utilise l'extension correspondant à son format réel et indique le format dans l'interface.
+
+Si le modèle ne retourne pas directement un format adapté à la lecture, implémente une conversion uniquement si elle est techniquement fiable, compatible avec le navigateur et raisonnable en ressources. Sinon, conserve le format valide fourni par le modèle.
+
+### 9. GESTION DES TÂCHES, REPRISE ET SAUVEGARDE
+
+L'application doit pouvoir gérer des livres volumineux sans obliger l'utilisateur à tout recommencer après une interruption.
+
+Sauvegarde localement dans IndexedDB :
+
+- Les métadonnées du livre.
+- Le texte extrait.
+- Le plan et les sections.
+- L'inventaire des idées.
+- Les scripts générés.
+- Les résultats de vérification.
+- Les validations manuelles.
+- Les paramètres non sensibles du projet.
+- Les fichiers audio produits.
+- L'état de chaque tâche.
+
+Utilise des états explicites, par exemple :
+
+À traiter, en cours, à vérifier, validé, audio en cours, terminé, échec.
+
+Sauvegarde les résultats après chaque étape importante et non uniquement à la fin du livre.
+
+Après un rechargement de page, l'application doit pouvoir retrouver les projets locaux et proposer de reprendre là où le traitement s'est arrêté.
+
+Ne stocke pas les clés API dans les sauvegardes de projets ou les exports.
+
+Si une génération était en cours au moment de la fermeture, ne prétends pas qu'elle a continué en arrière-plan. Restaure son état et propose de reprendre la tâche si nécessaire.
+
+Si le navigateur refuse l'accès à IndexedDB, manque d'espace ou supprime les données, affiche une erreur compréhensible.
+
+Ajoute une action permettant de supprimer définitivement un projet local, avec confirmation.
+
+Ajoute une option d'export des métadonnées et scripts du projet, sans clé API, ainsi qu'une option d'import si elle peut être mise en œuvre de manière fiable.
+
+La taille maximale d'un projet ne doit pas être présentée comme illimitée. Informe l'utilisateur que l'espace disponible dépend du navigateur et de l'appareil.
+
+### 10. TÉLÉCHARGEMENT ET EXPORTS
+
+Prévois trois possibilités :
+
+1. Télécharger le script d'une section en fichier texte.
+2. Télécharger un audio individuel.
+3. Télécharger tous les audios d'un livre dans une archive ZIP.
+
+L'archive ZIP doit contenir :
+
+- Un dossier ou un ensemble de fichiers clairement nommés.
+- Un audio par section disponible.
+- Un fichier `index.txt` récapitulant l'ordre des sections, leurs titres et leurs formats.
+- Facultativement, les scripts textuels si l'utilisateur a activé cette option.
+
+Ne jamais inclure les clés API, les informations secrètes ou le contenu du stockage local global dans l'archive.
+
+Si certaines sections n'ont pas d'audio, affiche la liste des fichiers qui seront inclus et préviens l'utilisateur avant la création de l'archive.
+
+La génération du ZIP doit se faire localement. Utilise une bibliothèque éprouvée compatible avec le navigateur.
+
+### 11. GESTION DES ERREURS ET DES QUOTAS
+
+Crée un système d'erreurs compréhensible.
+
+Traite notamment :
+
+- Clé invalide.
+- Modèle indisponible.
+- Modèle incompatible avec la tâche.
+- Quota épuisé.
+- Limite de débit atteinte.
+- Erreur réseau.
+- Réponse vide.
+- Réponse mal formée.
+- Contenu dépassant la limite autorisée.
+- Génération audio échouée.
+- Espace de stockage insuffisant.
+- PDF non extractible.
+- Interruption du navigateur.
+
+Lorsqu'une limite est atteinte, respecte les indications de l'API et applique une attente raisonnable si elle est appropriée. Ne lance pas de boucle infinie de nouvelles tentatives.
+
+Les nouvelles tentatives doivent être limitées et contrôlées. Préserve les résultats déjà obtenus.
+
+Ne prétends pas que plusieurs clés provenant du même projet possèdent des quotas indépendants. Les quotas peuvent dépendre du projet, du modèle et des conditions du fournisseur.
+
+Ne mets pas en place de contournement automatique des limites.
+
+### 12. INTERFACE UTILISATEUR
+
+Crée une interface moderne, sobre et agréable.
+
+L'application doit comporter les pages ou vues suivantes :
+
+- Tableau de bord.
+- Nouveau livre.
+- Bibliothèque des livres.
+- Plan du livre.
+- Travail sur les résumés.
+- Génération audio.
+- Lecteur et téléchargements.
+- Paramètres API.
+- Paramètres généraux.
+
+Sur le tableau de bord, affiche les projets récents et l'état de leur traitement.
+
+Pour chaque livre, affiche :
+
+- Titre.
+- Nombre de pages.
+- Nombre de sections.
+- Nombre de scripts validés.
+- Nombre d'audios disponibles.
+- Progression globale.
+- Dernière activité.
+
+Prévois une navigation claire, des indicateurs de progression, des confirmations pour les actions destructrices et des messages d'erreur utiles.
+
+Respecte les règles d'accessibilité essentielles : contrastes suffisants, navigation au clavier, labels explicites et boutons compréhensibles.
+
+Évite les animations lourdes et les dépendances visuelles inutiles.
+
+### 13. PROTECTION DU CONTENU ET CONFIDENTIALITÉ
+
+L'application doit expliquer clairement la différence entre le traitement local et le traitement distant.
+
+Traitement local :
+
+- Importation du PDF.
+- Extraction du texte.
+- Organisation des projets.
+- Stockage local.
+- Lecture audio.
+- Création des archives ZIP.
+
+Traitement distant, lorsque l'utilisateur lance une requête Gemini :
+
+- Envoi des passages nécessaires à l'analyse.
+- Génération ou correction du script.
+- Génération audio si le modèle choisi l'exige.
+
+N'envoie jamais automatiquement l'intégralité d'un livre à Gemini.
+
+Demande le consentement de l'utilisateur avant le premier envoi de contenu externe pour un projet.
+
+Privilégie le traitement par section, en tenant compte des limites de contexte et du coût.
+
+N'intègre aucune télémétrie obligatoire, publicité, analytique distante ou collecte cachée.
+
+Ne promets pas une confidentialité absolue : les conditions de traitement du contenu envoyé à Google dépendent du service, du compte, du modèle et des conditions applicables. Oriente l'utilisateur vers la documentation officielle pertinente.
+
+### 14. PERFORMANCE ET SOBRIÉTÉ
+
+L'application doit fonctionner sur un ordinateur personnel ordinaire et ne pas supposer que l'utilisateur possède une machine puissante.
+
+- Évite les dépendances inutiles.
+- Traite les documents par lots.
+- Libère les objets temporaires et URL blob lorsqu'ils ne sont plus nécessaires.
+- Évite les copies multiples de fichiers audio volumineux.
+- Prévois des indicateurs pendant les opérations longues.
+- Évite les opérations synchrones qui bloquent l'interface.
+- Utilise un Web Worker si cela améliore réellement les tâches lourdes et reste compatible avec le déploiement.
+- Ne télécharge pas automatiquement de gros modèles ou fichiers auxiliaires inutiles.
+
+L'application ne doit pas exiger une installation locale pour être utilisée après publication.
+
+### 15. TESTS ET CRITÈRES D'ACCEPTATION
+
+Avant de considérer le projet terminé, vérifie les points suivants.
+
+#### Importation et extraction
+- Un PDF textuel peut être importé.
+- Son texte peut être extrait et consulté.
+- Un PDF scanné est identifié comme non compatible avec cette version.
+- Les erreurs d'extraction sont affichées.
+
+#### Analyse et résumé
+- Le plan du livre est affiché.
+- Les sections peuvent être modifiées.
+- L'inventaire des idées est produit.
+- Un script explicatif est généré en français.
+- La vérification de couverture est disponible.
+- Le script peut être corrigé manuellement puis validé.
+
+#### API
+- Une clé peut être ajoutée.
+- Une clé peut être testée et supprimée.
+- La sélection des clés par tâche fonctionne.
+- Une clé n'est jamais intégrée au code public.
+- Les erreurs de quota et de modèle sont gérées.
+
+#### Audio
+- Un audio valide peut être généré pour une section.
+- Le lecteur fonctionne.
+- Le téléchargement individuel fonctionne.
+- Le format du fichier est correctement identifié.
+- Les sections échouées peuvent être relancées séparément.
+
+#### Persistance et export
+- Le projet est restauré après rechargement.
+- Les tâches terminées ne sont pas inutilement recommencées.
+- Les données locales peuvent être supprimées.
+- L'archive ZIP contient les audios disponibles.
+- Aucune clé API ne figure dans les exports.
+
+#### Déploiement
+- La compilation de production réussit.
+- Le site fonctionne avec le chemin de base GitHub Pages configuré.
+- Les ressources statiques se chargent correctement.
+- Le rafraîchissement des pages ne provoque pas d'erreur de routage.
+- Le site est utilisable sur ordinateur et mobile.
+
+Ne déclare pas un test réussi s'il n'a pas réellement été exécuté. Si tu ne peux pas tester un élément depuis ton environnement, indique-le explicitement.
+
+### 16. PUBLICATION GRATUITE SUR GITHUB PAGES
+
+Prépare le projet pour un dépôt GitHub public.
+
+Ajoute au minimum :
+
+- `README.md` en français.
+- `.gitignore`.
+- `.env.example` sans secret.
+- `package.json`.
+- La configuration Vite adaptée à GitHub Pages.
+- Le code source complet.
+- Un workflow GitHub Actions pour compiler et publier le site.
+- Une documentation des paramètres nécessaires.
+
+Le projet doit pouvoir être compilé et publié sans backend.
+
+Dans le README, explique étape par étape :
+
+1. Comment exporter ou récupérer le code depuis Google AI Studio.
+2. Comment créer un dépôt GitHub public.
+3. Comment importer les fichiers du projet.
+4. Comment vérifier qu'aucune clé API n'est présente dans les fichiers.
+5. Comment activer GitHub Actions et GitHub Pages.
+6. Comment lancer ou vérifier le premier déploiement.
+7. Comment retrouver l'URL publique.
+8. Comment mettre à jour l'application après une modification.
+9. Comment configurer les clés API depuis l'interface.
+10. Comment supprimer les données locales ou révoquer une clé compromise.
+
+Configure correctement le chemin de base Vite pour un site publié à l'adresse `https://<utilisateur>.github.io/<nom-du-depot>/`.
+
+Si le dépôt utilise un nom de dépôt particulier, documente le paramètre à modifier.
+
+Le workflow doit compiler le projet, publier le résultat de production et échouer clairement en cas d'erreur.
+
+N'inscris aucune clé API dans les variables publiques de build, dans GitHub Actions ou dans les fichiers publiés. Les secrets côté serveur ne sont pas nécessaires à cette architecture et les variables intégrées à un build frontend ne doivent pas être considérées comme secrètes.
+
+Le coût obligatoire d'hébergement doit être nul dans la configuration retenue, sous réserve des conditions et limites du service GitHub Pages.
+
+Ne garantis pas que les appels Gemini sont illimités ou toujours gratuits.
+
+### 17. ORDRE DE RÉALISATION
+
+Développe le projet dans cet ordre :
+
+Phase 1 — Architecture et socle :
+- Structure du projet.
+- Configuration Vite et React.
+- Navigation et interface générale.
+- Vérification de la compilation.
+
+Phase 2 — PDF et stockage :
+- Importation.
+- Extraction locale.
+- Structuration.
+- Persistance IndexedDB.
+
+Phase 3 — Gestion des clés :
+- Ajout, sélection et test.
+- Conservation facultative.
+- Gestion des erreurs.
+- Vérification de sécurité.
+
+Phase 4 — Intelligence documentaire :
+- Découpage.
+- Inventaire des idées.
+- Génération des scripts.
+- Contrôle de couverture.
+- Validation humaine.
+
+Phase 5 — Audio :
+- Génération.
+- Lecture.
+- Téléchargements.
+- Archive ZIP.
+- Reprise des tâches.
+
+Phase 6 — Qualité et déploiement :
+- Tests.
+- Corrections.
+- Compilation.
+- Workflow GitHub Actions.
+- README et guide de publication.
+
+Après chaque phase, vérifie la cohérence du code et corrige les erreurs avant de continuer.
+
+Si la réponse devient trop longue ou si l'environnement limite la quantité de code générable, avance par étapes en conservant les fichiers et fonctionnalités déjà produits. Ne remplace pas une application incomplète par une simple maquette.
+
+### 18. PREMIÈRE ACTION ATTENDUE
+
+Commence par examiner les possibilités réelles de l'environnement Google AI Studio Build et les capacités actuelles de l'API Gemini nécessaires au projet.
+
+Puis :
+
+1. Présente brièvement l'architecture retenue et les éventuelles incompatibilités.
+2. Crée le projet React + TypeScript complet.
+3. Implémente les fonctionnalités dans l'ordre défini.
+4. Teste les fonctions essentielles disponibles dans ton environnement.
+5. Corrige les erreurs détectées.
+6. Prépare les fichiers nécessaires au déploiement GitHub Pages.
+7. Termine par un guide concret indiquant les opérations que je dois effectuer moi-même dans Google AI Studio et GitHub.
+
+Ne t'arrête pas à une proposition de plan. **Commence réellement la construction de l'application et livre les fichiers nécessaires à sa publication.**
