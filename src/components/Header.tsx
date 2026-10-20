@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp, ActiveView } from '../context/AppContext';
 import { 
   BookOpen, 
@@ -11,10 +11,13 @@ import {
   Settings, 
   CheckCircle2, 
   AlertCircle,
-  FolderArchive
+  FolderArchive,
+  Github
 } from 'lucide-react';
+import { GitHubDeployModal } from './GitHubDeployModal';
 
 export const Header: React.FC = () => {
+  const [deployModalOpen, setDeployModalOpen] = useState(false);
   const {
     activeView,
     setActiveView,
@@ -137,8 +140,23 @@ export const Header: React.FC = () => {
               </span>
             </div>
           </button>
+
+          {/* GitHub Pages Deploy button */}
+          <button
+            onClick={() => setDeployModalOpen(true)}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-colors"
+            title="Guide de publication GitHub Pages"
+          >
+            <Github className="w-3.5 h-3.5 text-amber-400" />
+            <span>Déployer (GitHub)</span>
+          </button>
         </div>
       </div>
+
+      <GitHubDeployModal
+        isOpen={deployModalOpen}
+        onClose={() => setDeployModalOpen(false)}
+      />
 
       {/* Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-800/60 overflow-x-auto scrollbar-none">
